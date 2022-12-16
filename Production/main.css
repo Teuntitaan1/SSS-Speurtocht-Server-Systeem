@@ -1,0 +1,29 @@
+.Checkmark {
+    width: 1rem;
+    height: 1rem;
+}
+.Uncompleted {
+    visibility: hidden;
+}
+.Completed {
+    visibility: visible;
+}
+
+/*Alles voor de vraagselectie*/
+.Question {
+    border-radius: 5px;
+    background-color: gray;
+
+    height: 20rem;
+    flex: 1 20rem;
+    
+
+
+}
+
+#SelectionScreen {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+}
