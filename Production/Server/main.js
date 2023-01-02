@@ -1,8 +1,5 @@
 // fs is short for file system and it handles the opening and closing of the json file containing the questions
 const fs = require('fs');
-const QuestionFile = fs.readFileSync('Questions.json');
-
-
 
 // the http module handles the server part of this file, it acan process http requests
 const http = require("http");
@@ -17,7 +14,7 @@ const requestListener = function (req, res) {
     // writehead is the http response the client should recieve
     res.writeHead(200);
     // end is the actual response the client recieves
-    res.end(QuestionFile);
+    res.end(fs.readFileSync('Questions.json'));
 };
 
 // creates the server

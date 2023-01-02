@@ -19,7 +19,6 @@ request.onload = () => {
     const data = request.response;
     // sets the QuestionList variable(frequently used throughout the program) to the recieved data from the server(should be a json file containing all the questions)
     QuestionList = data;
-    console.log(QuestionList);
 
     // Dynamicly loads in all questions from the QuestionList dictionary
     var Index = 0
