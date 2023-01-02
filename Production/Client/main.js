@@ -1,29 +1,57 @@
-// currently hardcoded variables
+// Variables needed for the program,
 var CurrentQuestion = 0;
-const QuestionList = [
+var QuestionList = [];
+
+//
+//
+//
+// BEFORE QUEST FUNCTIONS
+
+
+// Initial page setup, requests all the questions and displays them on the website
+const request = new XMLHttpRequest();
+request.open("GET", "http://localhost:8000");
+request.send();
+request.responseType = "json";
+request.onload = () => {
+  if (request.readyState == 4 && request.status == 200) {
     
-    {"Title" : "Vraag 1", "Description" : "Werkt", "Code" : "bij",
-      "Option1" : "Willekeurig", "Option2" : "Antwoord", "Option3" : "Op een", "Option4" : "Knop", "CorrectAnswer" : "Option1"},
+    const data = request.response;
+    // sets the QuestionList variable(frequently used throughout the program) to the recieved data from the server(should be a json file containing all the questions)
+    QuestionList = data;
+    console.log(QuestionList);
 
-    {"Title" : "Vraag 2", "Description" : "Dit", "Code" : "honing",
-     "Option1" : "Maar", "Option2" : "Dan", "Option3" : "Nu", "Option4" : "Goed", "CorrectAnswer" : "Option2"},
+    // Dynamicly loads in all questions from the QuestionList dictionary
+    var Index = 0
+    QuestionList.forEach(Question => {
+        document.getElementById("SelectionScreen").innerHTML +=
+            `<div id="${"Question" + Index}" class="QuestionSelection">
 
-    {"Title" : "Vraag 3", "Description" : "Nu", "Code" : "bloem",
-     "Option1" : "Werkend", "Option2" : "(Hopelijk)", "Option3" : "Btw", "Option4" : "Dit", "CorrectAnswer" : "Option3"},
+                <h3 class="QuestionSelectionTitle">${Question["Title"]}</h3>
+                <img src="./Images/checkmark.png" class="QuestionSelectionCheckmark"/>
+                
+                <form name="QuestionCodeInput${Index}" onsubmit="ValidateCode(${Index});return false">
+                
+                    Code: <input type="text" name="Code">
+                    <input type="submit" value="Submit">
+                    
+                </form>
 
-    {"Title" : "Vraag 4", "Description" : "Eindelijk", "Code" : "nectar",
-     "Option1" : "Is", "Option2" : "Best", "Option3" : "Wel", "Option4" : "Leuk", "CorrectAnswer" : "Option2"},
+                <p id="FormOutcome${Index}"></p>
 
-    {"Title" : "Vraag 5" , "Description" : "Eens", "Code" : "planten",
-     "Option1" : "Om", "Option2" : "Te", "Option3" : "Doen!", "Option4" : "Tot", "CorrectAnswer" : "Option1"},
+            </div>`; 
+        Index += 1;
+    });
 
-    {"Title" : "Vraag 6", "Description" : "Goed", "Code" : "bestuiven",
-     "Option1" : "Morgen", "Option2" : "In", "Option3" : "De", "Option4" : "Les", "CorrectAnswer" : "Option4"},
+  } else {
+    console.log(`Error: ${request.status}`);
+  }
+};
 
-    {"Title" : "Vraag 7", "Description" : "En normaal?", "Code" : "imker",
-     "Option1" : "Dan", "Option2" : "Gaan", "Option3" : "We goed", "Option4" : "Werken", "CorrectAnswer" : "Option1"},
-
-];
+//
+//
+//
+// DURING QUEST FUNCTIONS
 
 
 // checks the inputted code for the question 
@@ -82,25 +110,3 @@ function SetQuestion(Question) {
 }
 
 
-// This executes after the initial page load
-// Dynamicly loads in all questions from the QuestionList dictionary
-var Index = 0
-QuestionList.forEach(Question => {
-    document.getElementById("SelectionScreen").innerHTML +=
-        `<div id="${"Question" + Index}" class="QuestionSelection">
-
-            <h3 class="QuestionSelectionTitle">${Question["Title"]}</h3>
-            <img src="./Images/checkmark.png" class="QuestionSelectionCheckmark"/>
-            
-            <form name="QuestionCodeInput${Index}" onsubmit="ValidateCode(${Index});return false">
-            
-                Code: <input type="text" name="Code">
-                <input type="submit" value="Submit">
-                
-            </form>
-
-            <p id="FormOutcome${Index}"></p>
-
-        </div>`; 
-    Index += 1;
-});
