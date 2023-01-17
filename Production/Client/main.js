@@ -1,4 +1,3 @@
-
 // Variables needed for the program,
 var CurrentQuestion = 0;
 var QuestionList = [];
@@ -10,7 +9,7 @@ var QuestionList = [];
 
 
 // Initial page setup, requests all the questions and displays them on the website
-const request = new H();
+const request = new XMLHttpRequest();
 request.open("GET", "http://localhost:8000");
 request.send();
 request.responseType = "json";

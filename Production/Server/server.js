@@ -1,4 +1,5 @@
-// the http module handles the server part of this file, it acan process http requests
+// the http module handles the server part of this file, it can process http requests
+const fs = require("fs");
 const http = require("http");
 const host = 'localhost';
 const port = 8000;
@@ -15,7 +16,7 @@ function GetRequest(request, response) {
     // writehead is the http response the client should recieve
     response.writeHead(200);
     // end is the actual response the client recieves
-    response.end("GetRequest done");
+    response.end(fs.readFileSync("Questions.json"));
 }
 
 function PostRequest(request, response) {
@@ -24,9 +25,8 @@ function PostRequest(request, response) {
     var body = '';
     request.on('data', function (data) {
         body += data; //body data
+        console.log(`Data received: ${body}`);
     });
-
-    console.log(`Data received: ${body}`);
 
     response.setHeader("Content-Type", "application/json");
     response.setHeader("Access-Control-Allow-Origin", "*");
@@ -34,7 +34,7 @@ function PostRequest(request, response) {
     response.writeHead(200);
 
     // write the actual response.
-    response.end("Dit is een test");
+    response.end("Data ontvangen");
 }
 
 // function that listens for request and handles them accordingly
