@@ -1,16 +1,25 @@
 // Variables needed for the program,
+
+// HTTP variables
+const request = new XMLHttpRequest();
+const URL = "http://localhost:8000";
+//Functions for running the questions
 var CurrentQuestion = 0;
 var QuestionList = [];
 
+//statistics for the end of the program
+var Statistics = {"CorrectFirstTime" : 0, "TimeSpent" : 0};
+
+// updates the TimeSpent index in Statistics
+setInterval(() => {
+    Statistics["TimeSpent"]++;
+}, 1000);
 //
 //
 //
 // BEFORE QUEST FUNCTIONS
-
-
 // Initial page setup, requests all the questions and displays them on the website
-const request = new XMLHttpRequest();
-request.open("GET", "http://localhost:8000");
+request.open("GET", URL);
 request.send();
 request.responseType = "json";
 request.onload = () => {
@@ -19,9 +28,10 @@ request.onload = () => {
     const data = request.response;
     // sets the QuestionList variable(frequently used throughout the program) to the recieved data from the server(should be a json file containing all the questions)
     QuestionList = data;
+    AmountOfQuestions = QuestionList.length;
 
     // Dynamicly loads in all questions from the QuestionList dictionary
-    var Index = 0
+    var Index = 0;
     QuestionList.forEach(Question => {
         document.getElementById("SelectionScreen").innerHTML +=
             `<div id="${"Question" + Index}" class="QuestionSelection">
@@ -107,5 +117,3 @@ function SetQuestion(Question) {
     document.getElementById("Option3").innerHTML = Question["Option3"];
     document.getElementById("Option4").innerHTML = Question["Option4"];
 }
-
-
