@@ -25,7 +25,7 @@ function PostRequest(request, response) {
     var body = '';
     request.on('data', function (data) {
         body += data; //body data
-        console.log(`Data received: ${body}`);
+        JSON.parse(body);
     });
 
     response.setHeader("Content-Type", "application/json");
@@ -34,19 +34,19 @@ function PostRequest(request, response) {
     response.writeHead(200);
 
     // write the actual response.
-    response.end("Data ontvangen");
+    response.end("Gelukt, we hebben de data ontvangen!");
 }
 
 // function that listens for request and handles them accordingly
 const requestListener = function (request, response) {
-    
-    if (request.method == "GET") {
+
+    if (request.method === "GET") {
         console.log("GET request was received");
 
         GetRequest(request, response);
     }
     
-    else if (request.method == "POST") {
+    else if (request.method === "POST") {
        
         console.log("POST request was received");
 
@@ -55,8 +55,7 @@ const requestListener = function (request, response) {
     // if the client sends a not implemented http request
     else {
         
-        console.log("Bad request was received");
-
+        console.log(`Bad request was received : Received ${request.method}`);
         response.setHeader("Content-Type", "text/plain");
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.writeHead(500);
