@@ -7,7 +7,8 @@ const port = 8000;
 //
 //
 // Extra variables
-
+// read file
+const LeaderBoardFile = fs.readFileSync('LeaderBoard.json');
 
 function GetRequest(request, response) {
     // header stuff which i know next to nothing about, i do know that the setheader function works like a dictionary
@@ -16,7 +17,7 @@ function GetRequest(request, response) {
     // writehead is the http response the client should recieve
     response.writeHead(200);
     // end is the actual response the client recieves
-    response.end(fs.readFileSync("Questions.json"));
+    response.end(fs.readFileSync("LeaderBoard.json"));
 }
 
 function PostRequest(request, response) {
@@ -25,8 +26,14 @@ function PostRequest(request, response) {
     var body = '';
     request.on('data', function (data) {
         body += data; //body data
-        JSON.parse(body);
     });
+    console.log(body);
+    console.log(JSON.parse(body));
+
+    //append data to json file
+    //const LeaderBoardData = JSON.parse(LeaderBoardFile.toString());
+    //LeaderBoardData.push(JSON.parse(body));
+    //fs.writeFileSync("LeaderBoard.json", JSON.stringify(body));
 
     response.setHeader("Content-Type", "application/json");
     response.setHeader("Access-Control-Allow-Origin", "*");
