@@ -1,5 +1,5 @@
 // the http module handles the server part of this file, it can process http requests
-const fs = require("fs");
+const filesystem = require("fs");
 const http = require("http");
 const host = 'localhost';
 const port = 8000;
@@ -7,68 +7,66 @@ const port = 8000;
 //
 //
 // Extra variables
-// read file
-const LeaderBoardFile = fs.readFileSync('LeaderBoard.json');
 
 function GetRequest(request, response) {
     // header stuff which i know next to nothing about, i do know that the setheader function works like a dictionary
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Content-Type", "text/plain");
     // writehead is the http response the client should recieve
     response.writeHead(200);
     // end is the actual response the client recieves
-    response.end(fs.readFileSync("LeaderBoard.json"));
+    response.end(JSON.stringify(require("./Leaderboard.json")));
 }
 
 function PostRequest(request, response) {
     
-    // Loads the data in in chunks and stops when there's no more data to receive
-    var body = '';
-    request.on('data', function (data) {
-        body += data; //body data
+    // keeps on reading data until no more is coming
+    var Data = null;
+    const chunks = [];
+    request.on("data", (chunk) => {
+      chunks.push(chunk);
     });
-    console.log(body);
-    console.log(JSON.parse(body));
+    request.on("end", () => {
+      Data = JSON.parse(Buffer.concat(chunks));
+      console.log(`Received data: `, Data);
+      //append data to json file
+      const LeaderBoardData = require("./Leaderboard.json");
+      LeaderBoardData.push(Data);
+      filesystem.writeFileSync("LeaderBoard.json", JSON.stringify(LeaderBoardData));
+    });
 
-    //append data to json file
-    //const LeaderBoardData = JSON.parse(LeaderBoardFile.toString());
-    //LeaderBoardData.push(JSON.parse(body));
-    //fs.writeFileSync("LeaderBoard.json", JSON.stringify(body));
+    response.setHeader("Content-Type", "text/plain");
 
-    response.setHeader("Content-Type", "application/json");
-    response.setHeader("Access-Control-Allow-Origin", "*");
     // http code OK
     response.writeHead(200);
 
     // write the actual response.
-    response.end("Gelukt, we hebben de data ontvangen!");
+    response.end("");
 }
 
 // function that listens for request and handles them accordingly
 const requestListener = function (request, response) {
 
-    if (request.method === "GET") {
-        console.log("GET request was received");
+    console.log(`Received a ${request.method} request`);
 
-        GetRequest(request, response);
-    }
-    
-    else if (request.method === "POST") {
-       
-        console.log("POST request was received");
+    response.setHeader("Access-Control-Allow-Origin", "*");
 
-        PostRequest(request, response);
-    }
-    // if the client sends a not implemented http request
-    else {
+
+    switch (request.method) {
         
-        console.log(`Bad request was received : Received ${request.method}`);
-        response.setHeader("Content-Type", "text/plain");
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.writeHead(500);
-        response.end("This function is not implemented");
-    }
+        case "GET":
+            GetRequest(request, response);
+            break;
+        case "POST":
+            PostRequest(request, response);
+            break;
 
+        default:
+            response.setHeader("Content-Type", "text/plain");
+            response.writeHead(500);
+            response.end("This function is not implemented");
+            break;
+    }
+    console.log(`\n`);
 };
 //
 //
