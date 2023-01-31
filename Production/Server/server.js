@@ -14,7 +14,7 @@ function GetRequest(request, response) {
     // writehead is the http response the client should recieve
     response.writeHead(200);
     // end is the actual response the client recieves
-    response.end(JSON.stringify(require("./Leaderboard.json")));
+    response.end(filesystem.readFileSync("./Leaderboard.json"));
 }
 
 function PostRequest(request, response) {
@@ -29,7 +29,7 @@ function PostRequest(request, response) {
       Data = JSON.parse(Buffer.concat(chunks));
       console.log(`Received data: `, Data);
       //append data to json file
-      const LeaderBoardData = require("./Leaderboard.json");
+      const LeaderBoardData = JSON.parse(filesystem.readFileSync("./Leaderboard.json"));
       LeaderBoardData.push(Data);
       filesystem.writeFileSync("LeaderBoard.json", JSON.stringify(LeaderBoardData));
     });
