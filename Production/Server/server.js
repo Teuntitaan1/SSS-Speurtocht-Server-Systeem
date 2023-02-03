@@ -6,7 +6,7 @@ const port = 8000;
 //
 //
 //
-// Extra variables
+var DebugOn = true;
 
 function GetRequest(request, response) {
     // header stuff which i know next to nothing about, i do know that the setheader function works like a dictionary
@@ -27,7 +27,11 @@ function PostRequest(request, response) {
     });
     request.on("end", () => {
       Data = JSON.parse(Buffer.concat(chunks));
-      console.log(`Received data: `, Data);
+      
+      if (DebugOn) {
+        console.log(`RECEIVED DATA:`);
+        console.table(Data);
+      }
       //append data to json file
       const LeaderBoardData = JSON.parse(filesystem.readFileSync("./Leaderboard.json"));
       LeaderBoardData.push(Data);
@@ -46,7 +50,9 @@ function PostRequest(request, response) {
 // function that listens for request and handles them accordingly
 const requestListener = function (request, response) {
 
-    console.log(`Received a ${request.method} request`);
+    if (DebugOn) {
+        console.log(`${new Date().toLocaleString()} || ${request.method} FROM ${request.socket.remoteAddress}`); // type of request + ip adress
+    }
 
     response.setHeader("Access-Control-Allow-Origin", "*");
 
@@ -66,7 +72,6 @@ const requestListener = function (request, response) {
             response.end("This function is not implemented");
             break;
     }
-    console.log(`\n`);
 };
 //
 //
@@ -77,4 +82,5 @@ const server = http.createServer(requestListener);
 // keeps the server up and running
 server.listen(port, host, () => {
     console.log(`Server is running on http://${host}:${port}`);
+    console.log(`Server started on ${new Date().toLocaleString()}`);
 });
