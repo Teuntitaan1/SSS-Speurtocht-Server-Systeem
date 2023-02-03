@@ -51,7 +51,7 @@ function PostRequest(request, response) {
 const requestListener = function (request, response) {
 
     if (DebugOn) {
-        console.log(`${new Date().toLocaleString()} || ${request.method} FROM ${request.socket.remoteAddress}`); // type of request + ip adress
+        console.log(`[${new Date().toLocaleString()}] || ${request.method} FROM ${request.socket.remoteAddress}`); // type of request + ip adress
     }
 
     response.setHeader("Access-Control-Allow-Origin", "*");
