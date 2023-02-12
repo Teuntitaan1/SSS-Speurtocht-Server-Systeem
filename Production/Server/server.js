@@ -14,6 +14,8 @@ function GetRequest(request, response) {
     // writehead is the http response the client should recieve
     response.writeHead(200);
     // end is the actual response the client recieves
+    console.log("SEND DATA: ");
+    console.table(JSON.parse(filesystem.readFileSync("./Leaderboard.json")));
     response.end(filesystem.readFileSync("./Leaderboard.json"));
 }
 
