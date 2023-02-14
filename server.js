@@ -2,7 +2,7 @@
 const filesystem = require("fs");
 const http = require("http");
 const host = 'localhost';
-const port = 8000;
+const port = process.env.port || 8000;
 //
 //
 //
