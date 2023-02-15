@@ -15,8 +15,14 @@ function GetRequest(request, response) {
     response.writeHead(200);
     // end is the actual response the client recieves
     console.log("SEND DATA: ");
-    console.table(JSON.parse(filesystem.readFileSync("./Leaderboard.json")));
-    response.end(filesystem.readFileSync("./Leaderboard.json"));
+    var UnorderedLeaderboard = JSON.parse(filesystem.readFileSync("./Leaderboard.json"));
+    var OrderedLeaderboard = [];
+
+    // not my code, sorted by score value
+    OrderedLeaderboard = UnorderedLeaderboard.sort((a,b) => b.Score - a.Score);
+
+    console.table(OrderedLeaderboard);
+    response.end(JSON.stringify(OrderedLeaderboard));
 }
 
 function PostRequest(request, response) {
