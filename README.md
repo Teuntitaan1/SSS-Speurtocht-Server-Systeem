@@ -1,3 +1,2 @@
-# ArcheonSpeurtocht
-
-A project made with all kinds of langauges with the sole purpose of providing an interesting quest for visitors of the historical park "Het Archeon"
+# archeonprojectserver
+the server part of the all new and improved digital quest available in the theme park: "Het Archeon".
