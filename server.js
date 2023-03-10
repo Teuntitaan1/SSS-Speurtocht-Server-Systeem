@@ -6,7 +6,7 @@ const port = process.env.port || 8000;
 //
 //
 //
-var DebugOn = true;
+var DebugOn = false;
 
 function GetRequest(request, response) {
     // header stuff which i know next to nothing about, i do know that the setheader function works like a dictionary
@@ -14,14 +14,24 @@ function GetRequest(request, response) {
     // writehead is the http response the client should recieve
     response.writeHead(200);
     // end is the actual response the client recieves
-    console.log("SEND DATA: ");
     var UnorderedLeaderboard = JSON.parse(filesystem.readFileSync("./Leaderboard.json"));
     var OrderedLeaderboard = [];
 
     // not my code, sorted by score value
-    OrderedLeaderboard = UnorderedLeaderboard.sort((a,b) => b.Score - a.Score);
+    OrderedLeaderboard = UnorderedLeaderboard.sort((a,b) => b.TotalPoints - a.TotalPoints);
+    // adds a position to the user to be displayed on the leaderboard
+    for (let index = 0; index < OrderedLeaderboard.length; index++) {
+        // makes the usernames shorter
+        if (OrderedLeaderboard[index].UserName.length > 10) {
+            OrderedLeaderboard[index].UserName = OrderedLeaderboard[index].UserName.slice(0, 10) + "...";
+        }
+        OrderedLeaderboard[index].Position = index+1;
+    }
+    if (DebugOn) {
+        console.log("SEND DATA: ");
+        console.table(OrderedLeaderboard);
+    }
 
-    console.table(OrderedLeaderboard);
     response.end(JSON.stringify(OrderedLeaderboard));
 }
 
@@ -52,7 +62,7 @@ function PostRequest(request, response) {
     response.writeHead(200);
 
     // write the actual response.
-    response.end("");
+    response.end();
 }
 
 // function that listens for request and handles them accordingly
