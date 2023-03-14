@@ -13,7 +13,7 @@ var DebugOn = false;
 
 
 async function GetRequest(request, response) {
-    // header stuff which i know next to nothing about, i do know that the setheader function works like a dictionary
+    response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Content-Type", "text/plain");
     // writehead is the http response the client should recieve
     response.writeHead(200);
@@ -45,14 +45,14 @@ async function PostRequest(request, response) {
       //append data to database
       Client.connect().then(() => {Client.db("Archeon-Leaderboard").collection("Leaderboard").insertOne(Data)});
     });
-
+    response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Content-Type", "text/plain");
 
     // http code OK
     response.writeHead(200);
 
     // write the actual response.
-    response.end();
+    response.end("Got data!");
 }
 
 // function that listens for request and handles them accordingly
@@ -61,9 +61,6 @@ const requestListener = function (request, response) {
     if (DebugOn) {
         console.log(`[${new Date().toLocaleString()}] || ${request.method} FROM ${request.socket.remoteAddress}`); // type of request + ip adress
     }
-
-    response.setHeader("Access-Control-Allow-Origin", "*");
-
 
     switch (request.method) {
         
@@ -75,6 +72,7 @@ const requestListener = function (request, response) {
             break;
 
         default:
+            response.setHeader("Access-Control-Allow-Origin", "*");
             response.setHeader("Content-Type", "text/plain");
             response.writeHead(500);
             response.end("This function is not implemented");
@@ -85,10 +83,9 @@ const requestListener = function (request, response) {
 //
 //
 //
-// creates the server
-const server = http.createServer(requestListener);
+// creates the server and
 // keeps the server up and running
-server.listen(port, host, () => {
+http.createServer(requestListener).listen(port, host, () => {
     console.log(`Server is running on http://${host}:${port}`);
     console.log(`Server started on ${new Date().toLocaleString()}`);
 });
