@@ -13,10 +13,13 @@ var DebugOn = false;
 
 
 async function GetRequest(request, response) {
-    response.setHeader("Access-Control-Allow-Origin", "*");
-    response.setHeader("Content-Type", "text/plain");
+    const headers = {
+        'Access-Control-Allow-Origin': '*', 
+        'Content-Type' : "text/plain"
+    }
+
     // writehead is the http response the client should recieve
-    response.writeHead(200);
+    response.writeHead(200, headers);
     const Leaderboard = await Client.connect().then(() => {return Client.db("Archeon-Leaderboard").collection("Leaderboard").find({}).sort({TotalPoints : -1}).toArray();});
 
     if (DebugOn) {
@@ -29,6 +32,10 @@ async function GetRequest(request, response) {
 
 async function PostRequest(request, response) {
     
+    const headers = {
+        'Access-Control-Allow-Origin': '*', 
+        'Content-Type' : "text/plain"
+    }
     // keeps on reading data until no more is coming
     var Data = null;
     const chunks = [];
@@ -45,11 +52,9 @@ async function PostRequest(request, response) {
       //append data to database
       Client.connect().then(() => {Client.db("Archeon-Leaderboard").collection("Leaderboard").insertOne(Data)});
     });
-    response.setHeader("Access-Control-Allow-Origin", "*");
-    response.setHeader("Content-Type", "text/plain");
 
     // http code OK
-    response.writeHead(200);
+    response.writeHead(200, headers);
 
     // write the actual response.
     response.end("Got data!");
@@ -70,9 +75,18 @@ const requestListener = function (request, response) {
         case "POST":
             PostRequest(request, response);
             break;
+        case "OPTIONS":
+            const headers = {
+                'Access-Control-Allow-Origin': '*', 
+                'Content-Type' : "text/plain",
+                'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
+                'Access-Control-Max-Age': 2592000,
+            }
+            response.writeHead(204, headers);
+            response.end();
 
         default:
-            response.setHeader("Access-Control-Allow-Origin", "*");
+            
             response.setHeader("Content-Type", "text/plain");
             response.writeHead(500);
             response.end("This function is not implemented");
