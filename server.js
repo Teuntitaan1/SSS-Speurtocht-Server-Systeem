@@ -13,13 +13,10 @@ var DebugOn = false;
 
 
 async function GetRequest(request, response) {
-    const headers = {
-        'Access-Control-Allow-Origin': '*', 
-        'Content-Type' : "text/plain"
-    }
 
+    response.setHeader('Content-Type', "text/plain");
     // writehead is the http response the client should recieve
-    response.writeHead(200, headers);
+    response.writeHead(200);
     const Leaderboard = await Client.connect().then(() => {return Client.db("Archeon-Leaderboard").collection("Leaderboard").find({}).sort({TotalPoints : -1}).toArray();});
 
     if (DebugOn) {
@@ -32,10 +29,7 @@ async function GetRequest(request, response) {
 
 async function PostRequest(request, response) {
     
-    const headers = {
-        'Access-Control-Allow-Origin': '*', 
-        'Content-Type' : "text/plain"
-    }
+    response.setHeader('Content-Type', "text/plain");
     // keeps on reading data until no more is coming
     var Data = null;
     const chunks = [];
@@ -54,7 +48,7 @@ async function PostRequest(request, response) {
     });
 
     // http code OK
-    response.writeHead(200, headers);
+    response.writeHead(200);
 
     // write the actual response.
     response.end("Got data!");
@@ -63,11 +57,18 @@ async function PostRequest(request, response) {
 // function that listens for request and handles them accordingly
 const requestListener = function (request, response) {
 
+    // Set CORS headers
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Request-Method', '*');
+    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+    response.setHeader('Access-Control-Allow-Headers', '*');
+
     if (DebugOn) {
         console.log(`[${new Date().toLocaleString()}] || ${request.method} FROM ${request.socket.remoteAddress}`); // type of request + ip adress
     }
 
     switch (request.method) {
+        
         
         case "GET":
             GetRequest(request, response);
@@ -76,13 +77,7 @@ const requestListener = function (request, response) {
             PostRequest(request, response);
             break;
         case "OPTIONS":
-            const headers = {
-                'Access-Control-Allow-Origin': '*', 
-                'Content-Type' : "text/plain",
-                'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
-                'Access-Control-Max-Age': 2592000,
-            }
-            response.writeHead(204, headers);
+            response.writeHead(204);
             response.end();
 
         default:
