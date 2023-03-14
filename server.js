@@ -1,51 +1,33 @@
 // the http module handles the server part of this file, it can process http requests
 const http = require("http");
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const MongoDB = require('mongodb');
 const host = 'localhost';
 const port = process.env.port || 8000;
 //
 //
 //
-
-const uri = "mongodb+srv://TeunWeijdener:zleGG3AycjJvSdyg@archeon-leaderboard.pkxjk0s.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-
+const uri = "mongodb+srv://PCUSER:ARCHEONTHEGOAT@archeon-leaderboard.pkxjk0s.mongodb.net/?retryWrites=true&w=majority";
+const Client = new MongoDB.MongoClient(uri);
+Client.connect().then(() => {console.log("Database connected");});
 var DebugOn = false;
 
-function GetRequest(request, response) {
+
+async function GetRequest(request, response) {
     // header stuff which i know next to nothing about, i do know that the setheader function works like a dictionary
     response.setHeader("Content-Type", "text/plain");
     // writehead is the http response the client should recieve
     response.writeHead(200);
-    // end is the actual response the client recieves
-    client.connect(err => {
-        // gets the leaderboard
-        const UnorderedLeaderboard = client.db("Archeon-Leaderboard").collection("Leaderboard");
-        console.log(UnorderedLeaderboard);
-        client.close();
+    const Leaderboard = await Client.connect().then(() => {return Client.db("Archeon-Leaderboard").collection("Leaderboard").find({}).sort({TotalPoints : -1}).toArray();});
 
-        var OrderedLeaderboard = [];
-
-        // not my code, sorted by score value
-        OrderedLeaderboard = UnorderedLeaderboard.sort((a,b) => b.TotalPoints - a.TotalPoints);
-        // adds a position to the user to be displayed on the leaderboard
-        for (let index = 0; index < OrderedLeaderboard.length; index++) {
-            // makes the usernames shorter
-            if (OrderedLeaderboard[index].UserName.length > 10) {
-                OrderedLeaderboard[index].UserName = OrderedLeaderboard[index].UserName.slice(0, 10) + "...";
-            }
-            OrderedLeaderboard[index].Position = index+1;
-        }
-        if (DebugOn) {
-            console.log("SEND DATA: ");
-            console.table(OrderedLeaderboard);
-        }
+    if (DebugOn) {
+        console.log("SEND DATA: ");
+        console.table(Leaderboard);
+    }
+    response.end(JSON.stringify(Leaderboard));
     
-        response.end(JSON.stringify(OrderedLeaderboard));
-      })
 }
 
-function PostRequest(request, response) {
+async function PostRequest(request, response) {
     
     // keeps on reading data until no more is coming
     var Data = null;
@@ -61,7 +43,7 @@ function PostRequest(request, response) {
         console.table(Data);
       }
       //append data to database
-      client.insertOne(Data);
+      Client.connect().then(() => {Client.db("Archeon-Leaderboard").collection("Leaderboard").insertOne(Data)});
     });
 
     response.setHeader("Content-Type", "text/plain");
