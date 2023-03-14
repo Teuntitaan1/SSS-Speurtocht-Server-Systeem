@@ -6,7 +6,7 @@ const app = express();
 app.use(express.text());
 
 // database
-const uri = process.env.uri;
+const uri = "mongodb+srv://PCUSER:ARCHEONTHEGOAT@archeon-leaderboard.pkxjk0s.mongodb.net/?retryWrites=true&w=majority";
 const Client = new MongoDB.MongoClient(uri);
 Client.connect().then(() => {console.log("Database connected");});
 
