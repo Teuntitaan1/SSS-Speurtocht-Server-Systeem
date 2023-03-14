@@ -6,7 +6,7 @@ const app = express();
 app.use(express.text());
 
 // database
-const uri = "mongodb+srv://PCUSER:ARCHEONTHEGOAT@archeon-leaderboard.pkxjk0s.mongodb.net/?retryWrites=true&w=majority";
+const uri = process.env.uri;
 const Client = new MongoDB.MongoClient(uri);
 Client.connect().then(() => {console.log("Database connected");});
 
@@ -15,7 +15,7 @@ app.get('/', async (request, response) => {
     
     // Set CORS headers
     response.set('Access-Control-Allow-Origin', '*');
-    console.log(`Got GET request from ${request.hostname}`);
+    console.log(`Got GET request from ${request.ip}`);
     response.status = 200;
     response.send(JSON.stringify(await Client.connect().then(() => {return Client.db("Archeon-Leaderboard").collection("Leaderboard").find({}).sort({TotalPoints : -1}).toArray();})));
   });
@@ -25,13 +25,12 @@ app.post('/', async (request, response) => {
     // Set CORS headers
     response.set('Access-Control-Allow-Origin', '*');
     
-    console.log(`Got GET request from ${request.hostname}`);
+    console.log(`Got POST request from ${request.ip}`);
     var Data = JSON.parse(request.body);
-    console.log(`Got data: ${Data.TotalPoints}`);
     //append data to database
     response.status = 200;
     response.send("Received data!");
     Client.connect().then(() => {Client.db("Archeon-Leaderboard").collection("Leaderboard").insertOne(Data);});
     
 });
-app.listen(port, () => {console.log("Server Running!")});
+app.listen(port, () => {console.log(`Server Running on ${port}!`)});
