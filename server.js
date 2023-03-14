@@ -1,11 +1,15 @@
 // the http module handles the server part of this file, it can process http requests
-const filesystem = require("fs");
 const http = require("http");
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const host = 'localhost';
 const port = process.env.port || 8000;
 //
 //
 //
+
+const uri = "mongodb+srv://TeunWeijdener:zleGG3AycjJvSdyg@archeon-leaderboard.pkxjk0s.mongodb.net/?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
 var DebugOn = false;
 
 function GetRequest(request, response) {
@@ -14,25 +18,31 @@ function GetRequest(request, response) {
     // writehead is the http response the client should recieve
     response.writeHead(200);
     // end is the actual response the client recieves
-    var UnorderedLeaderboard = JSON.parse(filesystem.readFileSync("./Leaderboard.json"));
-    var OrderedLeaderboard = [];
+    client.connect(err => {
+        // gets the leaderboard
+        const UnorderedLeaderboard = client.db("Archeon-Leaderboard").collection("Leaderboard");
+        console.log(UnorderedLeaderboard);
+        client.close();
 
-    // not my code, sorted by score value
-    OrderedLeaderboard = UnorderedLeaderboard.sort((a,b) => b.TotalPoints - a.TotalPoints);
-    // adds a position to the user to be displayed on the leaderboard
-    for (let index = 0; index < OrderedLeaderboard.length; index++) {
-        // makes the usernames shorter
-        if (OrderedLeaderboard[index].UserName.length > 10) {
-            OrderedLeaderboard[index].UserName = OrderedLeaderboard[index].UserName.slice(0, 10) + "...";
+        var OrderedLeaderboard = [];
+
+        // not my code, sorted by score value
+        OrderedLeaderboard = UnorderedLeaderboard.sort((a,b) => b.TotalPoints - a.TotalPoints);
+        // adds a position to the user to be displayed on the leaderboard
+        for (let index = 0; index < OrderedLeaderboard.length; index++) {
+            // makes the usernames shorter
+            if (OrderedLeaderboard[index].UserName.length > 10) {
+                OrderedLeaderboard[index].UserName = OrderedLeaderboard[index].UserName.slice(0, 10) + "...";
+            }
+            OrderedLeaderboard[index].Position = index+1;
         }
-        OrderedLeaderboard[index].Position = index+1;
-    }
-    if (DebugOn) {
-        console.log("SEND DATA: ");
-        console.table(OrderedLeaderboard);
-    }
-
-    response.end(JSON.stringify(OrderedLeaderboard));
+        if (DebugOn) {
+            console.log("SEND DATA: ");
+            console.table(OrderedLeaderboard);
+        }
+    
+        response.end(JSON.stringify(OrderedLeaderboard));
+      })
 }
 
 function PostRequest(request, response) {
@@ -50,10 +60,8 @@ function PostRequest(request, response) {
         console.log(`RECEIVED DATA:`);
         console.table(Data);
       }
-      //append data to json file
-      const LeaderBoardData = JSON.parse(filesystem.readFileSync("./Leaderboard.json"));
-      LeaderBoardData.push(Data);
-      filesystem.writeFileSync("LeaderBoard.json", JSON.stringify(LeaderBoardData));
+      //append data to database
+      client.insertOne(Data);
     });
 
     response.setHeader("Content-Type", "text/plain");
