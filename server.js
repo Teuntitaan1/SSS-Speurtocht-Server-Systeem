@@ -20,6 +20,15 @@ app.get('/', async (request, response) => {
     response.send(JSON.stringify(await Client.connect().then(() => {return Client.db("Archeon-Leaderboard").collection("Leaderboard").find({}).sort({TotalPoints : -1}).toArray();})));
   });
 
+app.get('/delete', async (request, response) => {
+
+  // Set CORS headers
+  response.set('Access-Control-Allow-Origin', '*');
+  console.log(`Got GET request from ${request.ip}`);
+  response.status = 200;
+  Client.connect().then(() => {Client.db("Archeon-Leaderboard").collection("Leaderboard").deleteMany({})});
+  response.send("Deleted all entries");
+});
 // post request
 app.post('/', async (request, response) => {
     // Set CORS headers
